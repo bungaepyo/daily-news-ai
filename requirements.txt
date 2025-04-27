@@ -1,0 +1,6 @@
+feedparser
+certifi
+requests
+torch
+transformers
+python-dotenv
