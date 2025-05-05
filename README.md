@@ -1,6 +1,6 @@
 # daily-news-ai
 
-daily-news-ai is a project designed to scrape, filter, and curate daily news articles from top RSS sources using AI. The goal of the project is to automatically identify and prioritize articles based on user-defined interests and deliver them via email.
+daily-news-ai is a project designed to scrape and filter news articles from top RSS sources, and curate them with LLM. The goal of the project is to automatically identify and prioritize articles based on user-defined interests and deliver via email.
 
 ## Installation
 
@@ -19,6 +19,7 @@ python -m daily_news_ai.main
 Create a `.env` file in the root directory with the following content:
 
 ```
+EMAIL_RECIPIENTS=["your_email@example.com"]
 SENDER_EMAIL=your_email@example.com
 PASSWORD=your_email_password (App-specific password)
 ```
