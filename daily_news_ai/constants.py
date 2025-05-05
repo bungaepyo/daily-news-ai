@@ -11,7 +11,7 @@ RSS_SOURCES = [
   "https://www.ft.com/rss/home",
 
   # Bloomberg
-  "https://feeds.bloomberg.com/news.rss"
+  "https://feeds.bloomberg.com/news.rss",
 
   # Nikkei Asia
   "https://asia.nikkei.com/rss/feed/nar",

@@ -43,6 +43,8 @@ def get_publisher_from_url(url):
 
 
 def format_date(published):
+    if not published:
+        return ""
     return published.strftime("%m/%d, %H:%M")
     
 
@@ -50,13 +52,12 @@ def fetch_articles_from_rss(rss_sources: list[str]) -> list[dict]:
     existing_urls = set()
     articles = []
     for url in rss_sources:
-        print(url)
         response = requests.get(url, verify=certifi.where())
         feed = feedparser.parse(response.text)
         publisher = get_publisher_from_url(url)
         for entry in feed.entries:
             # Skip articles older than 24 hours
-            parsed_date = eut.parsedate_to_datetime(entry.published)
+            parsed_date = eut.parsedate_to_datetime(entry.published) if entry.get('published') else None
             if parsed_date and parsed_date < datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=1):
                 continue
             # Skip duplicates
@@ -64,9 +65,9 @@ def fetch_articles_from_rss(rss_sources: list[str]) -> list[dict]:
                 continue
             article = {
                 'publisher': publisher,
-                'title': entry.title,
-                'link': entry.link,
-                'description': entry.description,
+                'title': entry.get("title", ""),
+                'link': entry.get("link", ""),
+                'description': entry.get("description", ""),
                 'published': parsed_date,
             }
             articles.append(article)
