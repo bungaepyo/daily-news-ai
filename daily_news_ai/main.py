@@ -2,7 +2,6 @@ from transformers import pipeline
 from daily_news_ai.constants import (
     RSS_SOURCES,
     KEYWORDS,
-    EMAIL_RECIPIENTS,
 )
 from daily_news_ai.helper import (
     fetch_articles_from_rss,
@@ -30,7 +29,7 @@ def main():
     body = keyword_body + "\n" + publisher_body
 
     print("Generating email...")
-    send_email("Daily News AI: Today's Articles", body, EMAIL_RECIPIENTS)
+    send_email("Daily News AI: Today's Articles", body)
 
 if __name__ == "__main__":
     main()

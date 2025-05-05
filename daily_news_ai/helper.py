@@ -4,6 +4,7 @@ import certifi
 import feedparser
 import smtplib
 import os
+import json
 from dotenv import load_dotenv
 import email.utils as eut
 from email.mime.multipart import MIMEMultipart
@@ -102,10 +103,14 @@ def format_publisher_articles(articles_by_publisher: dict[str, list[dict]]) -> s
     return body
 
 
-def send_email(subject: str, body: str, recipient_email: list[str]):
+def send_email(subject: str, body: str):
     sender_email = os.getenv("SENDER_EMAIL")
     if not sender_email:
         raise ValueError("Sender email not found in environment variables.")
+    
+    recipient_emails = json.loads(os.getenv("EMAIL_RECIPIENTS"))
+    if not recipient_emails:
+        raise ValueError("Recipient emails not found in environment variables.")
 
     password = os.getenv("PASSWORD")
     if not password:
@@ -113,7 +118,7 @@ def send_email(subject: str, body: str, recipient_email: list[str]):
 
     msg = MIMEMultipart()
     msg['From'] = sender_email
-    msg['To'] = ",".join(recipient_email)
+    msg['To'] = ",".join(recipient_emails)
     msg['Subject'] = subject
     msg.attach(MIMEText(body, 'html'))
     
@@ -121,7 +126,7 @@ def send_email(subject: str, body: str, recipient_email: list[str]):
         server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
         server.starttls()
         server.login(sender_email, password)
-        server.sendmail(sender_email, ",".join(recipient_email), msg.as_string())
+        server.sendmail(sender_email, ",".join(recipient_emails), msg.as_string())
         server.close()
         print("Email sent successfully!")
     except Exception as e:

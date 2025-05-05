@@ -1,4 +1,4 @@
-# Publisher RSS sources
+# RSS Sources
 RSS_SOURCES = [
     "https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml",
     "https://rss.ft.com/rss/uk",
@@ -6,7 +6,7 @@ RSS_SOURCES = [
     # "https://www.wsj.com/xml/rss/3_7014.xml",
 ]
 
-# AI model configuration
+# LLM Config
 KEYWORDS = [
   # "Technology",
   # "Finance",
@@ -15,9 +15,6 @@ KEYWORDS = [
 ]
 KEYWORD_SCORE_THRESHOLD = 0.5
 
-# Email configuration
-EMAIL_RECIPIENTS = [
-  "bungaepyo@gmail.com"
-]
+# Exporter Config
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
