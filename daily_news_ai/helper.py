@@ -5,6 +5,7 @@ import feedparser
 import smtplib
 import os
 import json
+import datetime
 from dotenv import load_dotenv
 import email.utils as eut
 from email.mime.multipart import MIMEMultipart
@@ -24,31 +25,52 @@ def get_publisher_from_url(url):
         return "New York Times"
     elif "ft" in url:
         return "Financial Times"
-    # TODO: add more publishers as needed
+    elif "dowjones" in url:
+        return "Wall Street Journal"
+    elif "bloomberg" in url:
+        return "Bloomberg"
+    elif "nikkei" in url:
+        return "Nikkei Asia"
+    elif "economist" in url:
+        return "The Economist"
+    elif "washingtonpost" in url:
+        return "Washington Post"
+    elif "politico" in url:
+        return "Politico"
+    elif "scmp" in url:
+        return "South China Morning Post"
     return "Unknown"
 
 
 def format_date(published):
-    parsed_date = eut.parsedate_to_datetime(published)
-    formatted_date = parsed_date.strftime("%m/%d, %H:%M") if parsed_date else published
-    return formatted_date
+    return published.strftime("%m/%d, %H:%M")
     
 
 def fetch_articles_from_rss(rss_sources: list[str]) -> list[dict]:
+    existing_urls = set()
     articles = []
     for url in rss_sources:
+        print(url)
         response = requests.get(url, verify=certifi.where())
         feed = feedparser.parse(response.text)
         publisher = get_publisher_from_url(url)
         for entry in feed.entries:
+            # Skip articles older than 24 hours
+            parsed_date = eut.parsedate_to_datetime(entry.published)
+            if parsed_date and parsed_date < datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=1):
+                continue
+            # Skip duplicates
+            if entry.link in existing_urls:
+                continue
             article = {
                 'publisher': publisher,
                 'title': entry.title,
                 'link': entry.link,
                 'description': entry.description,
-                'published': entry.published,
+                'published': parsed_date,
             }
             articles.append(article)
+            existing_urls.add(entry.link)
     return articles
 
 
