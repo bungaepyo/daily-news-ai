@@ -65,12 +65,12 @@ RSS_SOURCES = [
 
 # LLM Config
 KEYWORDS = [
-  # "Technology",
-  # "Finance",
+  "Business",
+  "Industries",
+  "Technology",
   "Politics",
-  # "Economy"
 ]
-KEYWORD_SCORE_THRESHOLD = 0.75
+KEYWORD_SCORE_THRESHOLD = 0.8
 
 # Exporter Config
 SMTP_SERVER = "smtp.gmail.com"

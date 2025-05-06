@@ -75,18 +75,22 @@ def fetch_articles_from_rss(rss_sources: list[str]) -> list[dict]:
     return articles
 
 
-def classify_article(article_content: str, candidate_labels: list[str], classifier) -> float:
-    result = classifier(article_content, candidate_labels)
-    return result['scores'][0]
+def classify_article(article_content: str, candidate_labels: list[str], classifier) -> dict[str, float]:
+    result = classifier(article_content, candidate_labels, multi_label=True)
+    return dict(zip(result['labels'], result['scores']))
 
-
-def filter_keyword_articles(articles: list[dict], keywords: list[str], classifier) -> list[dict]:
-    keyword_articles = []
+def group_articles_by_keyword(articles: list[dict], keywords: list[str], classifier) -> dict[str, list[dict]]:
+    keyword_groups = {keyword: [] for keyword in keywords}
+    
     for article in articles:
-        score = classify_article(f"{article['title']}. {article['description']}", keywords, classifier)
-        if score > KEYWORD_SCORE_THRESHOLD:
-            keyword_articles.append(article)
-    return keyword_articles
+        content = f"{article['title']}. {article['description']}"
+        scores = classify_article(content, keywords, classifier)
+        
+        for keyword, score in scores.items():
+            if score >= KEYWORD_SCORE_THRESHOLD:
+                keyword_groups[keyword].append(article)
+    
+    return keyword_groups
 
 
 def group_articles_by_publisher(articles: list[dict]) -> dict[str, list[dict]]:
@@ -97,17 +101,19 @@ def group_articles_by_publisher(articles: list[dict]) -> dict[str, list[dict]]:
     return articles_by_publisher
 
 
-def format_keyword_articles(keyword_articles: list[dict]) -> str:
-    body = f"<h3>By Keyword: {KEYWORDS[0]}</h3>"
-    body += "<ul>"
-    for article in keyword_articles:
-        publisher = article['publisher']
-        title = article['title']
-        link = article['link']
-        published = article['published']
-        formatted_date = format_date(published)
-        body += f"<li>{publisher}: <a href='{link}'>{title}</a> (Published {formatted_date})</li>"
-    body += "</ul>"
+def format_keyword_articles(articles_by_keyword: dict[str, list[dict]]) -> str:
+    body = f"<h3>By Keyword</h3>"
+    for keyword, articles in articles_by_keyword.items():
+        body += f"<h4>{keyword}</h4>"
+        body += "<ul>"
+        for article in articles:
+            publisher = article['publisher']
+            title = article['title']
+            link = article['link']
+            published = article['published']
+            formatted_date = format_date(published)
+            body += f"<li>{publisher}: <a href='{link}'>{title}</a> (Published {formatted_date})</li>"
+        body += "</ul>"
     return body
 
 
